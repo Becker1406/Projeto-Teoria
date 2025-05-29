@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 typedef struct {
     double valor;
@@ -52,10 +53,17 @@ void gerar_itens(Item *itens, int n) {
 
 int main() {
     srand(time(NULL));
-    int tamanhos[] = {100, 1000, 5000};
+    int tamanhos[] = {100, 1000, 5000, 10000};
     int num_tamanhos = sizeof(tamanhos) / sizeof(tamanhos[0]);
     int repeticoes = 20;
     double capacidade = 1000.0;
+
+    FILE *fp = fopen("resultados.csv", "w");
+    if (fp == NULL) {
+        printf("Erro ao criar arquivo CSV.\n");
+        return 1;
+    }
+    fprintf(fp, "tamanho_itens,tempo_medio,desvio_padrao\n");
 
     for (int t = 0; t < num_tamanhos; t++) {
         int n = tamanhos[t];
@@ -78,8 +86,11 @@ int main() {
 
         double media = soma_tempos / repeticoes;
         double desvio = sqrt((soma_quad / repeticoes) - (media * media));
+        fprintf(fp, "%d,%.6f,%.6f\n", n, media, desvio);
         printf("%d itens -> Tempo médio: %.6fs | Desvio-padrão: %.6fs\n", n, media, desvio);
     }
 
+    fclose(fp);
+    printf("Dados exportados para 'resultados.csv'\n");
     return 0;
 }
